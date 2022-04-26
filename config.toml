@@ -1,4 +1,4 @@
-baseURL = 'http://example.org/'
+baseURL = 'https://hhanh00.github.io/harpo-docs/'
 languageCode = 'en-us'
 title = 'Harpo'
 
@@ -6,6 +6,8 @@ theme = "hugo-theme-learn"
 
 [params]
 themeVariant = "blue"
+showVisitedLinks = true
+disableLandingPageButton = true
 
 [outputs]
 home = [ "HTML", "RSS", "JSON"]
