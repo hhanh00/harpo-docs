@@ -1,0 +1,11 @@
+baseURL = 'http://example.org/'
+languageCode = 'en-us'
+title = 'Harpo'
+
+theme = "hugo-theme-learn"
+
+[params]
+themeVariant = "blue"
+
+[outputs]
+home = [ "HTML", "RSS", "JSON"]
