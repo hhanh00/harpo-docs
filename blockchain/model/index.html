@@ -5,7 +5,7 @@
 <meta name=generator content="Hugo 0.91.2">
 <meta name=description content>
 <link rel=icon href=/images/favicon.png type=image/png>
-<title>Block Sync :: Harpo</title>
+<title>Data Model :: Harpo</title>
 <link href=/css/nucleus.css?1651729478 rel=stylesheet>
 <link href=/css/fontawesome-all.min.css?1651729478 rel=stylesheet>
 <link href=/css/hybrid.css?1651729478 rel=stylesheet>
@@ -20,7 +20,7 @@
 <script src=/js/jquery-3.3.1.min.js?1651729478></script>
 <style>:root #header+#content>#left>#rlblock_left{display:none!important}</style>
 </head>
-<body data-url=/chainsync/block_sync/>
+<body data-url=/blockchain/model/>
 <nav id=sidebar class=showVisitedLinks>
 <div id=header-wrapper>
 <div id=header>
@@ -40,8 +40,7 @@
 </div>
 <div class=highlightable>
 <ul class=topics>
-<li data-nav-id=/chainsync/ title=ChainSync class="dd-item
-parent">
+<li data-nav-id=/chainsync/ title=ChainSync class=dd-item>
 <a href=/chainsync/>
 <b>1. </b>ChainSync
 <i class="fas fa-check read-icon"></i>
@@ -59,7 +58,7 @@ Sync Mode
 <i class="fas fa-check read-icon"></i>
 </a>
 </li>
-<li data-nav-id=/chainsync/block_sync/ title="Block Sync" class="dd-item active">
+<li data-nav-id=/chainsync/block_sync/ title="Block Sync" class=dd-item>
 <a href=/chainsync/block_sync/>
 Block Sync
 <i class="fas fa-check read-icon"></i>
@@ -67,13 +66,14 @@ Block Sync
 </li>
 </ul>
 </li>
-<li data-nav-id=/blockchain/ title=Blockchain class=dd-item>
+<li data-nav-id=/blockchain/ title=Blockchain class="dd-item
+parent">
 <a href=/blockchain/>
 <b>2. </b>Blockchain
 <i class="fas fa-check read-icon"></i>
 </a>
 <ul>
-<li data-nav-id=/blockchain/model/ title="Data Model" class=dd-item>
+<li data-nav-id=/blockchain/model/ title="Data Model" class="dd-item active">
 <a href=/blockchain/model/>
 Data Model
 <i class="fas fa-check read-icon"></i>
@@ -112,15 +112,16 @@ Game
 </span>
 <span id=toc-menu><i class="fas fa-list-alt"></i></span>
 <span class=links>
-<a href=/>Harpo Coin</a> > <a href=/chainsync/>ChainSync</a> > Block Sync
+<a href=/>Harpo Coin</a> > <a href=/blockchain/>Blockchain</a> > Data Model
 </span>
 </div>
 <div class=progress>
 <div class=wrapper>
 <nav id=TableOfContents>
 <ul>
-<li><a href=#notes>Notes</a></li>
-<li><a href=#block-validation>Block Validation</a></li>
+<li><a href=#block>Block</a></li>
+<li><a href=#proof-of-work>Proof of Work</a></li>
+<li><a href=#block-tree>Block Tree</a></li>
 </ul>
 </nav>
 </div>
@@ -131,34 +132,58 @@ Game
 </div>
 <div id=body-inner>
 <h1>
-Block Sync
+Data Model
 </h1>
-<h2 id=notes>Notes</h2>
+<p>As its name suggests, the Blockchain is a set of blocks
+roughly organized as a chain. Ideally, every block
+would be neatly lined up and form a single linked list.</p>
+<h2 id=block>Block</h2>
+<p>A block has the following properties:</p>
 <ul>
-<li>Follow bittorrent principles</li>
-<li>a block = a piece</li>
-<li>we only download from peers</li>
-<li>we don&rsquo;t choke peers</li>
+<li>a hash value that serves as its unique identifier. Hash values
+are considered unique as long as they refer to different content</li>
+<li>a reference to the previous block as a field <code>prev_hash</code></li>
 </ul>
-<p>TODO: Study the BitTorrent protocol</p>
-<h2 id=block-validation>Block Validation</h2>
-<ul>
-<li>Check merkle root</li>
-<li>Check transaction
-<ul>
-<li>zk proofs</li>
-<li>nullifiers</li>
-<li>auth signature</li>
-</ul>
-</li>
-</ul>
+<p>These two values are enough for linking the blocks.</p>
+<p>The rest of the properties are related to the &ldquo;blockchain rules&rdquo;.</p>
+<p>It is not enough for a block to be structurally correct to be
+allowed in the blockchain. It must also follow other rules
+that enforce the correct business behavior.</p>
+<h2 id=proof-of-work>Proof of Work</h2>
+<p>A block has a proof of work value. It is computed based on the current
+block difficulty. A block is accepted if its hash is below a hash value
+derived from the difficulty. The higher the difficulty, the lower the
+threshold. Miners can affect the block hash by varying the <code>nonce</code> field
+of the block header.</p>
+<h2 id=block-tree>Block Tree</h2>
+<p>As mentioned earlier, we wish blocks would always follow one another. But
+by the nature of decentralized mining, it is possible, in fact, it is a
+relatively common occurrence, to see two blocks or more following the same
+block.</p>
+<p>For example, a miner in Asia and a miner in Europe may both independently
+find a suitable <code>nonce</code> and produce different but valid blocks.</p>
+<p>In this case, we should remember that none of the new blocks is intrinsically
+better. The network is split between nodes that received and processed
+the &ldquo;first&rdquo; new block and the nodes that received and processed the &ldquo;other&rdquo;.
+However, the notion of &ldquo;first&rdquo; and &ldquo;second&rdquo; is relative. Every node would not
+receive the blocks in the same order due to their geographic and network distance.</p>
+<p>We say that the network has a &ldquo;split-brain&rdquo; and is not consistent.
+The blocks possibly can contain different transactions, leading to some of the nodes
+thinking that certain transactions were made but other nodes don&rsquo;t.</p>
+<p>It is unfortunate but normal and expected when dealing with decentralized
+systems.</p>
+<p>Therefore, the blocks do not form a perfect chain but since they can sometimes be
+sharing the same predecessor, they form a tree. Typically one of the branches is
+very long (it is the main chain), and there are short-lived branches from time to time.</p>
+<p>In the next section, we&rsquo;ll describe the &ldquo;Blockchain Game&rdquo; that is a simplified
+version of the set of blockchain rules.</p>
 <footer class=footline>
 </footer>
 </div>
 </div>
 <div id=navigation>
-<a class="nav nav-prev" href=/chainsync/sync/ title="Sync Mode"> <i class="fa fa-chevron-left"></i></a>
-<a class="nav nav-next" href=/blockchain/ title=Blockchain style=margin-right:0><i class="fa fa-chevron-right"></i></a>
+<a class="nav nav-prev" href=/blockchain/ title=Blockchain> <i class="fa fa-chevron-left"></i></a>
+<a class="nav nav-next" href=/blockchain/game/ title=Game style=margin-right:0><i class="fa fa-chevron-right"></i></a>
 </div>
 </section>
 <div style=left:-1000px;overflow:scroll;position:absolute;top:-1000px;border:none;box-sizing:content-box;height:200px;margin:0;padding:0;width:200px>
